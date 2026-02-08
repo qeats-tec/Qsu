@@ -2,7 +2,11 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Qeat's RHYTHM v2.0</title>
+    <title>Qsu!</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <style>
         body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; color: white; cursor: none; }
         
@@ -46,7 +50,10 @@
 
         /* Oyun İçi UI */
         #ui { position: absolute; top: 40px; left: 40px; font-size: 30px; font-weight: 900; z-index: 100; opacity: 0; transition: 0.5s; }
-        #guide { position: absolute; width: 35px; height: 35px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 0 20px white; display: none; }
+        
+        /* KOMBO VE REHBER EKLEMELERİ */
+        #guide { position: absolute; width: 35px; height: 35px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 0 20px white; display: none; transition: 0.15s ease-out; }
+        #combo-ui { position: absolute; bottom: 50px; width: 100%; text-align: center; font-size: 55px; font-weight: 900; z-index: 100; pointer-events: none; opacity: 0; transition: 0.2s; color: #ff00ff; text-shadow: 0 0 20px rgba(255,0,255,0.5); }
         
         .note { position: absolute; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; background: rgba(0, 0, 0, 0.8); z-index: 10; border: 4px solid; }
         .approach { position: absolute; border: 3px solid; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 11; }
@@ -82,7 +89,7 @@
         <div id="menu">
             <div class="menu-content">
                 <div class="version-badge">DEMO v2.0</div>
-                <h1>Qeat's Rhythm</h1>
+                <h1>Qsu! by Qeat</h1>
                 <p style="opacity: 0.4; margin-bottom: 40px; letter-spacing: 5px;">BEAT THE MUSIC</p>
                 
                 <div class="btn-list">
@@ -93,6 +100,7 @@
         </div>
 
         <div id="ui">SCORE: <span id="score">000000</span></div>
+        <div id="combo-ui"><span id="combo-count">0</span><br><small style="font-size:15px; letter-spacing:8px; color:white;">COMBO</small></div>
         <div id="guide"></div>
     </div>
 
@@ -107,8 +115,11 @@
         const panel = document.getElementById('custom-panel');
         const openBtn = document.getElementById('openBtn');
         const ui = document.getElementById('ui');
+        const comboCountEl = document.getElementById('combo-count');
+        const comboUiEl = document.getElementById('combo-ui');
         
         let score = 0;
+        let combo = 0;
         let isPlaying = false;
         let activeNotes = [];
         const sequence = [{code:"KeyD", label:"D", color:"#ff00ff"}, {code:"KeyF", label:"F", color:"#00d2ff"}, {code:"KeyJ", label:"J", color:"#ffff00"}, {code:"KeyK", label:"K", color:"#00ff00"}];
@@ -170,12 +181,17 @@
             viewport.classList.remove('shake');
             void viewport.offsetWidth; 
             viewport.classList.add('shake');
+            // Nota kaçınca kombo gider
+            combo = 0;
+            comboUiEl.style.opacity = "0";
         }
 
         function moveAndSpawn() {
             let x = Math.random() * (window.innerWidth - 300) + 150;
             let y = Math.random() * (window.innerHeight - 300) + 150;
-            guide.style.left = x + 'px'; guide.style.top = y + 'px';
+            
+            guide.style.left = x + 'px'; 
+            guide.style.top = y + 'px';
 
             const item = sequence[seqIndex];
             const nEl = document.createElement('div');
@@ -213,7 +229,14 @@
             const idx = activeNotes.findIndex(n => n.code === e.code && n.scale > 0.7 && n.scale < 2.8 && !n.hit);
             if (idx !== -1) {
                 const n = activeNotes[idx];
-                n.hit = true; score += 300;
+                n.hit = true; 
+                score += 300;
+                
+                // Kombo artışı
+                combo++;
+                comboCountEl.innerText = combo;
+                comboUiEl.style.opacity = "1";
+
                 n.el.classList.add('hit-fx'); n.app.remove();
                 setTimeout(() => { n.el.remove(); activeNotes = activeNotes.filter(item => item !== n); }, 300);
                 scoreEl.innerText = score.toString().padStart(6, '0');
@@ -224,5 +247,3 @@
     </script>
 </body>
 </html>
-
-
