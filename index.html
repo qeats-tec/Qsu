@@ -2,52 +2,57 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Qeat's RHYTHM</title>
+    <title>Qeat's RHYTHM - DEMO v2.0</title>
     <style>
         body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; color: white; cursor: none; }
         
-        /* Sarsıntı için ana konteynır */
-        #viewport {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-        }
+        #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
         #bg-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -1;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            filter: brightness(0.4) contrast(1.1);
+            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            width: auto; height: auto; z-index: -1; transform: translate(-50%, -50%);
+            object-fit: cover; filter: brightness(0.3) contrast(1.1);
         }
 
-        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .menu-content { background: rgba(255,255,255,0.03); padding: 60px; border-radius: 40px; backdrop-filter: blur(20px); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        h1 { font-size: 60px; letter-spacing: 12px; margin: 0 0 30px 0; font-weight: 900; }
-        .btn { background: transparent; border: 2px solid #fff; padding: 15px 50px; color: #fff; font-size: 20px; cursor: pointer; font-weight: bold; margin: 10px; width: 350px; transition: 0.3s; }
-        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
-
-        #ui { position: absolute; top: 40px; left: 40px; font-size: 30px; font-weight: 900; z-index: 100; text-shadow: 0 0 15px #000; }
-        #guide { position: absolute; width: 35px; height: 35px; background: radial-gradient(circle, #fff 0%, transparent 80%); border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; transition: 0.12s; }
+        /* Ana Menü */
+        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.95) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; transition: 0.5s; }
+        .menu-content { text-align: center; }
+        h1 { font-size: 70px; letter-spacing: 15px; margin: 0; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        .version-badge { background: #ff00ff; color: white; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
         
-        .note { position: absolute; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; background: rgba(0, 0, 0, 0.75); z-index: 10; border: 4px solid; }
+        .btn-list { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 18px 60px; color: #fff; font-size: 18px; cursor: pointer; font-weight: bold; width: 400px; transition: 0.3s; border-radius: 10px; backdrop-filter: blur(5px); }
+        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 40px rgba(255,255,255,0.4); transform: translateY(-3px); }
+
+        /* Sağ Üst Şarkı Ekleme Paneli (Slide-out) */
+        #custom-panel {
+            position: absolute; top: 0; right: -350px; width: 300px; height: 100%;
+            background: rgba(0, 0, 0, 0.9); padding: 40px 25px;
+            backdrop-filter: blur(20px); border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 1100; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #custom-panel.active { right: 0; }
+        .toggle-panel-btn { position: absolute; top: 30px; right: 30px; background: white; color: black; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; z-index: 1050; transition: 0.3s; }
+        .toggle-panel-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px white; }
+
+        .close-btn { position: absolute; top: 20px; left: 20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.5; }
+        .close-btn:hover { opacity: 1; }
+
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #00d2ff; }
+        .input-group input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px; color: white; border-radius: 5px; cursor: pointer; }
+        
+        .play-custom { width: 100%; background: linear-gradient(45deg, #00d2ff, #3a7bd5); border: none; padding: 15px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+
+        /* Oyun İçi UI */
+        #ui { position: absolute; top: 40px; left: 40px; font-size: 30px; font-weight: 900; z-index: 100; opacity: 0; transition: 0.5s; }
+        #guide { position: absolute; width: 35px; height: 35px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 0 20px white; display: none; }
+        
+        .note { position: absolute; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; background: rgba(0, 0, 0, 0.8); z-index: 10; border: 4px solid; }
         .approach { position: absolute; border: 3px solid; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 11; }
         
-        /* Sarsıntı Animasyonu */
         .shake { animation: shakeAnim 0.15s ease-in-out; }
-        @keyframes shakeAnim {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(6px, 6px); }
-            75% { transform: translate(-6px, -6px); }
-        }
-
+        @keyframes shakeAnim { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(6px, 6px); } 75% { transform: translate(-6px, -6px); } }
         .hit-fx { transform: translate(-50%, -50%) scale(2.2) !important; opacity: 0 !important; transition: 0.4s ease-out !important; }
     </style>
 </head>
@@ -56,16 +61,39 @@
     <div id="viewport">
         <video id="bg-video" muted loop playsinline></video>
 
+        <button id="openBtn" class="toggle-panel-btn" onclick="togglePanel(true)">🎵 ŞARKI EKLE</button>
+
+        <div id="custom-panel">
+            <button class="close-btn" onclick="togglePanel(false)">✕</button>
+            <h2 style="margin-top: 20px; letter-spacing: 2px;">CUSTOM PLAYER</h2>
+            <p style="font-size: 12px; opacity: 0.6; margin-bottom: 40px;">Kendi medya dosyalarını yükle.</p>
+            
+            <div class="input-group">
+                <label>Müzik Dosyası (MP3)</label>
+                <input type="file" id="audioInput" accept="audio/*">
+            </div>
+            <div class="input-group">
+                <label>Video Arkaplan (MP4)</label>
+                <input type="file" id="videoInput" accept="video/*">
+            </div>
+            <button class="play-custom" onclick="startCustom()">OYUNU BAŞLAT ▶</button>
+        </div>
+
         <div id="menu">
             <div class="menu-content">
-                <h1>Qeat's Rhythm🪩</h1>
-                <button class="btn" onclick="start(1)">CRY FOR ME</button><br>
-                <button class="btn" onclick="start(2)">ENIGMATIC ENCOUNTER</button>
+                <div class="version-badge">DEMO v2.0</div>
+                <h1>Qeat's Rhythm</h1>
+                <p style="opacity: 0.4; margin-bottom: 40px; letter-spacing: 5px;">BEAT THE MUSIC</p>
+                
+                <div class="btn-list">
+                    <button class="btn" onclick="start(1)">CRY FOR ME</button>
+                    <button class="btn" onclick="start(2)">ENIGMATIC ENCOUNTER</button>
+                </div>
             </div>
         </div>
 
-        <div id="ui">Puan: <span id="score">000000</span></div>
-        <div id="guide" style="display:none"></div>
+        <div id="ui">SCORE: <span id="score">000000</span></div>
+        <div id="guide"></div>
     </div>
 
     <audio id="music"></audio>
@@ -76,6 +104,9 @@
         const scoreEl = document.getElementById('score');
         const bgVideo = document.getElementById('bg-video');
         const viewport = document.getElementById('viewport');
+        const panel = document.getElementById('custom-panel');
+        const openBtn = document.getElementById('openBtn');
+        const ui = document.getElementById('ui');
         
         let score = 0;
         let isPlaying = false;
@@ -83,10 +114,13 @@
         const sequence = [{code:"KeyD", label:"D", color:"#ff00ff"}, {code:"KeyF", label:"F", color:"#00d2ff"}, {code:"KeyJ", label:"J", color:"#ffff00"}, {code:"KeyK", label:"K", color:"#00ff00"}];
         let seqIndex = 0;
 
+        function togglePanel(isOpen) {
+            if(isOpen) panel.classList.add('active');
+            else panel.classList.remove('active');
+        }
+
         function start(songId) {
-            document.getElementById('menu').style.display = 'none';
-            guide.style.display = 'block';
-            
+            hideMenu();
             if (songId === 1) {
                 music.src = "Cry For Me WA WA WA.mp3";
                 bgVideo.src = "cryforme.mp4";
@@ -94,13 +128,34 @@
                 music.src = "[HQ] An Enigmatic Encounter V2 - Undertale Last Breath (Phase 3).mp3";
                 bgVideo.src = "enigmatic.mp4";
             }
-            
+            launchGame(songId === 1 ? 700 : 480);
+        }
+
+        function startCustom() {
+            const audioFile = document.getElementById('audioInput').files[0];
+            const videoFile = document.getElementById('videoInput').files[0];
+            if (!audioFile) return alert("Müzik dosyası seçmelisin!");
+
+            hideMenu();
+            music.src = URL.createObjectURL(audioFile);
+            if (videoFile) bgVideo.src = URL.createObjectURL(videoFile);
+            launchGame(600);
+        }
+
+        function hideMenu() {
+            document.getElementById('menu').style.opacity = '0';
+            setTimeout(() => document.getElementById('menu').style.display = 'none', 500);
+            panel.classList.remove('active');
+            openBtn.style.display = 'none';
+            ui.style.opacity = '1';
+            guide.style.display = 'block';
+        }
+
+        function launchGame(spawnRate) {
             bgVideo.load();
             bgVideo.play();
-            
             music.play().then(() => {
                 isPlaying = true;
-                const spawnRate = songId === 1 ? 700 : 480; 
                 const producer = () => {
                     if(!isPlaying) return;
                     if(activeNotes.length < 3) moveAndSpawn();
@@ -113,9 +168,8 @@
 
         function triggerShake() {
             viewport.classList.remove('shake');
-            void viewport.offsetWidth; // DOM'u tetikle (Reflow)
+            void viewport.offsetWidth; 
             viewport.classList.add('shake');
-            setTimeout(() => viewport.classList.remove('shake'), 150);
         }
 
         function moveAndSpawn() {
@@ -124,55 +178,48 @@
             guide.style.left = x + 'px'; guide.style.top = y + 'px';
 
             const item = sequence[seqIndex];
-            const noteEl = document.createElement('div');
-            noteEl.className = 'note';
-            noteEl.style.left = x + 'px'; noteEl.style.top = y + 'px';
-            noteEl.style.color = item.color; noteEl.style.borderColor = item.color;
-            noteEl.innerText = item.label;
+            const nEl = document.createElement('div');
+            nEl.className = 'note'; nEl.style.left = x+'px'; nEl.style.top = y+'px';
+            nEl.style.color = item.color; nEl.style.borderColor = item.color; nEl.innerText = item.label;
 
-            const appEl = document.createElement('div');
-            appEl.className = 'approach';
-            appEl.style.left = x + 'px'; appEl.style.top = y + 'px';
-            appEl.style.borderColor = item.color;
+            const aEl = document.createElement('div');
+            aEl.className = 'approach'; aEl.style.left = x+'px'; aEl.style.top = y+'px';
+            aEl.style.borderColor = item.color;
 
-            viewport.appendChild(noteEl);
-            viewport.appendChild(appEl);
-
-            activeNotes.push({ el: noteEl, app: appEl, code: item.code, x, y, scale: 4.0, hit: false });
+            viewport.appendChild(nEl); viewport.appendChild(aEl);
+            activeNotes.push({ el: nEl, app: aEl, code: item.code, scale: 4.0, hit: false });
             seqIndex = (seqIndex + 1) % sequence.length;
         }
 
         function gameLoop() {
             if (!isPlaying) return;
-            for (let i = activeNotes.length - 1; i >= 0; i--) {
-                let n = activeNotes[i];
+            activeNotes.forEach((n, i) => {
                 if (!n.hit) {
                     n.scale -= 0.052;
                     n.app.style.width = (90 * n.scale) + 'px';
                     n.app.style.height = (90 * n.scale) + 'px';
                     if (n.scale <= 0.7) {
-                        triggerShake(); // Kaçırınca sarsıl
+                        triggerShake();
                         n.el.remove(); n.app.remove();
                         activeNotes.splice(i, 1);
                     }
                 }
-            }
+            });
             requestAnimationFrame(gameLoop);
         }
 
         window.addEventListener('keydown', (e) => {
             if (!isPlaying) return;
             const idx = activeNotes.findIndex(n => n.code === e.code && n.scale > 0.7 && n.scale < 2.8 && !n.hit);
-            
             if (idx !== -1) {
                 const n = activeNotes[idx];
                 n.hit = true; score += 300;
                 n.el.classList.add('hit-fx'); n.app.remove();
                 setTimeout(() => { n.el.remove(); activeNotes = activeNotes.filter(item => item !== n); }, 300);
+                scoreEl.innerText = score.toString().padStart(6, '0');
             } else if (["KeyD","KeyF","KeyJ","KeyK"].includes(e.code)) {
-                triggerShake(); // Yanlış tuşta sarsıl
+                triggerShake();
             }
-            scoreEl.innerText = score.toString().padStart(6, '0');
         });
     </script>
 </body>
