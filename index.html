@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Qeat's RHYTHM</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; color: white; cursor: none; }
+        
+        /* Sarsıntı için ana konteynır */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.1);
+        }
+
+        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        .menu-content { background: rgba(255,255,255,0.03); padding: 60px; border-radius: 40px; backdrop-filter: blur(20px); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        h1 { font-size: 60px; letter-spacing: 12px; margin: 0 0 30px 0; font-weight: 900; }
+        .btn { background: transparent; border: 2px solid #fff; padding: 15px 50px; color: #fff; font-size: 20px; cursor: pointer; font-weight: bold; margin: 10px; width: 350px; transition: 0.3s; }
+        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
+
+        #ui { position: absolute; top: 40px; left: 40px; font-size: 30px; font-weight: 900; z-index: 100; text-shadow: 0 0 15px #000; }
+        #guide { position: absolute; width: 35px; height: 35px; background: radial-gradient(circle, #fff 0%, transparent 80%); border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; transition: 0.12s; }
+        
+        .note { position: absolute; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; background: rgba(0, 0, 0, 0.75); z-index: 10; border: 4px solid; }
+        .approach { position: absolute; border: 3px solid; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 11; }
+        
+        /* Sarsıntı Animasyonu */
+        .shake { animation: shakeAnim 0.15s ease-in-out; }
+        @keyframes shakeAnim {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(6px, 6px); }
+            75% { transform: translate(-6px, -6px); }
+        }
+
+        .hit-fx { transform: translate(-50%, -50%) scale(2.2) !important; opacity: 0 !important; transition: 0.4s ease-out !important; }
+    </style>
+</head>
+<body>
+
+    <div id="viewport">
+        <video id="bg-video" muted loop playsinline></video>
+
+        <div id="menu">
+            <div class="menu-content">
+                <h1>Qeat's Rhythm🪩</h1>
+                <button class="btn" onclick="start(1)">CRY FOR ME</button><br>
+                <button class="btn" onclick="start(2)">ENIGMATIC ENCOUNTER</button>
+            </div>
+        </div>
+
+        <div id="ui">Puan: <span id="score">000000</span></div>
+        <div id="guide" style="display:none"></div>
+    </div>
+
+    <audio id="music"></audio>
+
+    <script>
+        const music = document.getElementById('music');
+        const guide = document.getElementById('guide');
+        const scoreEl = document.getElementById('score');
+        const bgVideo = document.getElementById('bg-video');
+        const viewport = document.getElementById('viewport');
+        
+        let score = 0;
+        let isPlaying = false;
+        let activeNotes = [];
+        const sequence = [{code:"KeyD", label:"D", color:"#ff00ff"}, {code:"KeyF", label:"F", color:"#00d2ff"}, {code:"KeyJ", label:"J", color:"#ffff00"}, {code:"KeyK", label:"K", color:"#00ff00"}];
+        let seqIndex = 0;
+
+        function start(songId) {
+            document.getElementById('menu').style.display = 'none';
+            guide.style.display = 'block';
+            
+            if (songId === 1) {
+                music.src = "Cry For Me WA WA WA.mp3";
+                bgVideo.src = "cryforme.mp4";
+            } else {
+                music.src = "[HQ] An Enigmatic Encounter V2 - Undertale Last Breath (Phase 3).mp3";
+                bgVideo.src = "enigmatic.mp4";
+            }
+            
+            bgVideo.load();
+            bgVideo.play();
+            
+            music.play().then(() => {
+                isPlaying = true;
+                const spawnRate = songId === 1 ? 700 : 480; 
+                const producer = () => {
+                    if(!isPlaying) return;
+                    if(activeNotes.length < 3) moveAndSpawn();
+                    setTimeout(producer, spawnRate);
+                };
+                producer();
+                gameLoop();
+            });
+        }
+
+        function triggerShake() {
+            viewport.classList.remove('shake');
+            void viewport.offsetWidth; // DOM'u tetikle (Reflow)
+            viewport.classList.add('shake');
+            setTimeout(() => viewport.classList.remove('shake'), 150);
+        }
+
+        function moveAndSpawn() {
+            let x = Math.random() * (window.innerWidth - 300) + 150;
+            let y = Math.random() * (window.innerHeight - 300) + 150;
+            guide.style.left = x + 'px'; guide.style.top = y + 'px';
+
+            const item = sequence[seqIndex];
+            const noteEl = document.createElement('div');
+            noteEl.className = 'note';
+            noteEl.style.left = x + 'px'; noteEl.style.top = y + 'px';
+            noteEl.style.color = item.color; noteEl.style.borderColor = item.color;
+            noteEl.innerText = item.label;
+
+            const appEl = document.createElement('div');
+            appEl.className = 'approach';
+            appEl.style.left = x + 'px'; appEl.style.top = y + 'px';
+            appEl.style.borderColor = item.color;
+
+            viewport.appendChild(noteEl);
+            viewport.appendChild(appEl);
+
+            activeNotes.push({ el: noteEl, app: appEl, code: item.code, x, y, scale: 4.0, hit: false });
+            seqIndex = (seqIndex + 1) % sequence.length;
+        }
+
+        function gameLoop() {
+            if (!isPlaying) return;
+            for (let i = activeNotes.length - 1; i >= 0; i--) {
+                let n = activeNotes[i];
+                if (!n.hit) {
+                    n.scale -= 0.052;
+                    n.app.style.width = (90 * n.scale) + 'px';
+                    n.app.style.height = (90 * n.scale) + 'px';
+                    if (n.scale <= 0.7) {
+                        triggerShake(); // Kaçırınca sarsıl
+                        n.el.remove(); n.app.remove();
+                        activeNotes.splice(i, 1);
+                    }
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (!isPlaying) return;
+            const idx = activeNotes.findIndex(n => n.code === e.code && n.scale > 0.7 && n.scale < 2.8 && !n.hit);
+            
+            if (idx !== -1) {
+                const n = activeNotes[idx];
+                n.hit = true; score += 300;
+                n.el.classList.add('hit-fx'); n.app.remove();
+                setTimeout(() => { n.el.remove(); activeNotes = activeNotes.filter(item => item !== n); }, 300);
+            } else if (["KeyD","KeyF","KeyJ","KeyK"].includes(e.code)) {
+                triggerShake(); // Yanlış tuşta sarsıl
+            }
+            scoreEl.innerText = score.toString().padStart(6, '0');
+        });
+    </script>
+</body>
+</html>
