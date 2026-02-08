@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Qsu!</title>
+    <title>Qsu! - Rhythm Game v2.0</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
@@ -18,17 +18,31 @@
             object-fit: cover; filter: brightness(0.3) contrast(1.1);
         }
 
+        /* Vuruş Parıltısı (Cila 1) */
+        #flash {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 2000; transition: opacity 0.1s;
+        }
+
+        /* Beat Pulse Efekti (Cila 3) */
+        @keyframes beatPulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.02); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        .pulse-active { animation: beatPulse 0.5s infinite ease-in-out; }
+
         /* Ana Menü */
         #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.95) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; transition: 0.5s; }
         .menu-content { text-align: center; }
-        h1 { font-size: 70px; letter-spacing: 15px; margin: 0; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
-        .version-badge { background: #ff00ff; color: white; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
+        h1 { font-size: 85px; letter-spacing: 20px; margin: 0; font-weight: 900; text-shadow: 0 0 30px rgba(0,210,255,0.4); }
+        .version-badge { background: #00d2ff; color: black; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
         
         .btn-list { display: flex; flex-direction: column; gap: 15px; align-items: center; }
         .btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 18px 60px; color: #fff; font-size: 18px; cursor: pointer; font-weight: bold; width: 400px; transition: 0.3s; border-radius: 10px; backdrop-filter: blur(5px); }
-        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 40px rgba(255,255,255,0.4); transform: translateY(-3px); }
+        .btn:hover { background: #00d2ff; color: #000; box-shadow: 0 0 40px rgba(0,210,255,0.6); transform: translateY(-3px); }
 
-        /* Sağ Üst Şarkı Ekleme Paneli (Slide-out) */
+        /* Sağ Üst Panel */
         #custom-panel {
             position: absolute; top: 0; right: -350px; width: 300px; height: 100%;
             background: rgba(0, 0, 0, 0.9); padding: 40px 25px;
@@ -37,23 +51,17 @@
         }
         #custom-panel.active { right: 0; }
         .toggle-panel-btn { position: absolute; top: 30px; right: 30px; background: white; color: black; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; z-index: 1050; transition: 0.3s; }
-        .toggle-panel-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px white; }
-
-        .close-btn { position: absolute; top: 20px; left: 20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.5; }
-        .close-btn:hover { opacity: 1; }
-
-        .input-group { margin-bottom: 25px; text-align: left; }
-        .input-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #00d2ff; }
-        .input-group input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px; color: white; border-radius: 5px; cursor: pointer; }
         
-        .play-custom { width: 100%; background: linear-gradient(45deg, #00d2ff, #3a7bd5); border: none; padding: 15px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; text-transform: uppercase; color: #00d2ff; margin-bottom: 8px; }
+        .input-group input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px; color: white; border-radius: 5px; }
+        
+        .play-custom { width: 100%; background: #00d2ff; border: none; padding: 15px; border-radius: 10px; color: black; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
         /* Oyun İçi UI */
-        #ui { position: absolute; top: 40px; left: 40px; font-size: 30px; font-weight: 900; z-index: 100; opacity: 0; transition: 0.5s; }
-        
-        /* KOMBO VE REHBER EKLEMELERİ */
+        #ui { position: absolute; top: 40px; left: 40px; font-size: 28px; font-weight: 900; z-index: 100; opacity: 0; transition: 0.5s; letter-spacing: 2px; }
         #guide { position: absolute; width: 35px; height: 35px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 0 20px white; display: none; transition: 0.15s ease-out; }
-        #combo-ui { position: absolute; bottom: 50px; width: 100%; text-align: center; font-size: 55px; font-weight: 900; z-index: 100; pointer-events: none; opacity: 0; transition: 0.2s; color: #ff00ff; text-shadow: 0 0 20px rgba(255,0,255,0.5); }
+        #combo-ui { position: absolute; bottom: 50px; width: 100%; text-align: center; font-size: 60px; font-weight: 900; z-index: 100; pointer-events: none; opacity: 0; transition: 0.2s; color: #00d2ff; text-shadow: 0 0 25px rgba(0,210,255,0.5); }
         
         .note { position: absolute; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; background: rgba(0, 0, 0, 0.8); z-index: 10; border: 4px solid; }
         .approach { position: absolute; border: 3px solid; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 11; }
@@ -66,41 +74,49 @@
 <body>
 
     <div id="viewport">
+        <div id="flash"></div>
         <video id="bg-video" muted loop playsinline></video>
 
         <button id="openBtn" class="toggle-panel-btn" onclick="togglePanel(true)">🎵 ŞARKI EKLE</button>
 
         <div id="custom-panel">
-            <button class="close-btn" onclick="togglePanel(false)">✕</button>
-            <h2 style="margin-top: 20px; letter-spacing: 2px;">Senden Gelen!</h2>
-            <p style="font-size: 12px; opacity: 0.6; margin-bottom: 40px;">Kendi kafana uyan "Qsu!" oyununu yap!!</p>
-            
+            <button style="background:none; border:none; color:white; font-size:24px; cursor:pointer;" onclick="togglePanel(false)">✕</button>
+            <h2 style="margin-top: 20px;">Qsu! Custom</h2>
             <div class="input-group">
-                <label>Müzik Dosyası (MP3)</label>
+                <label>MP3 Dosyası</label>
                 <input type="file" id="audioInput" accept="audio/*">
             </div>
             <div class="input-group">
-                <label>Video Arkaplan (MP4)</label>
+                <label>MP4 Dosyası</label>
                 <input type="file" id="videoInput" accept="video/*">
             </div>
-            <button class="play-custom" onclick="startCustom()">osu! Oyununu Başlat ▶</button>
+            <button class="play-custom" onclick="startCustom()">Qsu! BAŞLAT ▶</button>
         </div>
 
         <div id="menu">
             <div class="menu-content">
                 <div class="version-badge">DEMO v2.0</div>
-                <h1>Qsu! by Qeat</h1>
+                <h1>Qsu!</h1>
                 <p style="opacity: 0.4; margin-bottom: 40px; letter-spacing: 5px;">BEAT THE MUSIC</p>
                 
                 <div class="btn-list">
-                    <button class="btn" onclick="start(1)">CRY FOR ME.</button>
+                    <button class="btn" onclick="start(1)">CRY FOR ME</button>
                     <button class="btn" onclick="start(2)">ENIGMATIC ENCOUNTER</button>
+                    <button class="btn" onclick="start(3)">THE RESET (MEME)</button>
                 </div>
             </div>
         </div>
 
-        <div id="ui">SCORE: <span id="score">000000</span></div>
-        <div id="combo-ui"><span id="combo-count">0</span><br><small style="font-size:15px; letter-spacing:8px; color:white;">COMBO</small></div>
+        <div id="ui">
+            SCORE: <span id="score">000000</span> 
+            <span style="margin-left:20px; color:#00d2ff;">RANK: <span id="rank">C</span></span>
+        </div>
+        
+        <div id="combo-ui">
+            <span id="combo-count">0</span><br>
+            <small style="font-size:15px; letter-spacing:8px; color:white;">COMBO</small>
+        </div>
+        
         <div id="guide"></div>
     </div>
 
@@ -110,6 +126,8 @@
         const music = document.getElementById('music');
         const guide = document.getElementById('guide');
         const scoreEl = document.getElementById('score');
+        const rankEl = document.getElementById('rank');
+        const flashEl = document.getElementById('flash');
         const bgVideo = document.getElementById('bg-video');
         const viewport = document.getElementById('viewport');
         const panel = document.getElementById('custom-panel');
@@ -126,8 +144,15 @@
         let seqIndex = 0;
 
         function togglePanel(isOpen) {
-            if(isOpen) panel.classList.add('active');
-            else panel.classList.remove('active');
+            panel.classList.toggle('active', isOpen);
+        }
+
+        function getRank(s) {
+            if (s > 60000) return 'SS';
+            if (s > 40000) return 'S';
+            if (s > 20000) return 'A';
+            if (s > 10000) return 'B';
+            return 'C';
         }
 
         function start(songId) {
@@ -135,18 +160,22 @@
             if (songId === 1) {
                 music.src = "Cry For Me WA WA WA.mp3";
                 bgVideo.src = "cryforme.mp4";
-            } else {
+                launchGame(700);
+            } else if (songId === 2) {
                 music.src = "[HQ] An Enigmatic Encounter V2 - Undertale Last Breath (Phase 3).mp3";
                 bgVideo.src = "enigmatic.mp4";
+                launchGame(480);
+            } else if (songId === 3) {
+                music.src = "Girlfriends - New Computers.mp3";
+                bgVideo.src = "THE RESET.mp4";
+                launchGame(500);
             }
-            launchGame(songId === 1 ? 700 : 480);
         }
 
         function startCustom() {
             const audioFile = document.getElementById('audioInput').files[0];
             const videoFile = document.getElementById('videoInput').files[0];
-            if (!audioFile) return alert("Müzik dosyası seçmelisin!");
-
+            if (!audioFile) return alert("Müzik seç!");
             hideMenu();
             music.src = URL.createObjectURL(audioFile);
             if (videoFile) bgVideo.src = URL.createObjectURL(videoFile);
@@ -165,6 +194,7 @@
         function launchGame(spawnRate) {
             bgVideo.load();
             bgVideo.play();
+            bgVideo.classList.add('pulse-active');
             music.play().then(() => {
                 isPlaying = true;
                 const producer = () => {
@@ -181,7 +211,6 @@
             viewport.classList.remove('shake');
             void viewport.offsetWidth; 
             viewport.classList.add('shake');
-            // Nota kaçınca kombo gider
             combo = 0;
             comboUiEl.style.opacity = "0";
         }
@@ -189,9 +218,7 @@
         function moveAndSpawn() {
             let x = Math.random() * (window.innerWidth - 300) + 150;
             let y = Math.random() * (window.innerHeight - 300) + 150;
-            
-            guide.style.left = x + 'px'; 
-            guide.style.top = y + 'px';
+            guide.style.left = x + 'px'; guide.style.top = y + 'px';
 
             const item = sequence[seqIndex];
             const nEl = document.createElement('div');
@@ -231,15 +258,19 @@
                 const n = activeNotes[idx];
                 n.hit = true; 
                 score += 300;
-                
-                // Kombo artışı
                 combo++;
+                
+                // Cila: Flash & UI Update
+                flashEl.style.opacity = "0.2";
+                setTimeout(() => flashEl.style.opacity = "0", 100);
+                
                 comboCountEl.innerText = combo;
                 comboUiEl.style.opacity = "1";
+                scoreEl.innerText = score.toString().padStart(6, '0');
+                rankEl.innerText = getRank(score);
 
                 n.el.classList.add('hit-fx'); n.app.remove();
                 setTimeout(() => { n.el.remove(); activeNotes = activeNotes.filter(item => item !== n); }, 300);
-                scoreEl.innerText = score.toString().padStart(6, '0');
             } else if (["KeyD","KeyF","KeyJ","KeyK"].includes(e.code)) {
                 triggerShake();
             }
@@ -247,4 +278,3 @@
     </script>
 </body>
 </html>
-
